@@ -360,9 +360,13 @@ struct SpinBox: View {
         .cornerRadius(14)
         .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.dimmer, lineWidth: 1))
         .sheet(isPresented: $showPad) {
-            NumberInputPad(label: label, min: min, max: max, value: $value, isPresented: $showPad)
-                .presentationDetents([.fraction(0.72)])
-                .presentationDragIndicator(.visible)
+            if #available(iOS 16.0, *) {
+                NumberInputPad(label: label, min: min, max: max, value: $value, isPresented: $showPad)
+                    .presentationDetents([.fraction(0.72)])
+                    .presentationDragIndicator(.visible)
+            } else {
+                NumberInputPad(label: label, min: min, max: max, value: $value, isPresented: $showPad)
+            }
         }
     }
 }
