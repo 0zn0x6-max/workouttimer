@@ -24,14 +24,14 @@ jobs:
 
       - name: Show Xcode version
         run: xcodebuild -version
-
+        
       - name: List schemes
-        run: xcodebuild -project WorkoutTimer.xcodeproj -list
+        run: xcodebuild -project WorkoutTimerXcode/WorkoutTimer/WorkoutTimer.xcodeproj -list
 
       - name: Build (no signing)
         run: |
           xcodebuild \
-            -project WorkoutTimer.xcodeproj \
+            -project WorkoutTimerXcode/WorkoutTimer/WorkoutTimer.xcodeproj \
             -scheme WorkoutTimer \
             -configuration Release \
             -sdk iphoneos \
@@ -42,7 +42,7 @@ jobs:
             AD_HOC_CODE_SIGNING_ALLOWED=YES \
             CONFIGURATION_BUILD_DIR=$PWD/build \
             clean build
-            
+        
       - name: Package IPA
         run: |
           mkdir -p Payload
