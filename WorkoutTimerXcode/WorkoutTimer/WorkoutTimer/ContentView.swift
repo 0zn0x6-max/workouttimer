@@ -256,7 +256,7 @@ struct NumberInputPad: View {
                 Spacer()
                 Button("Done") { commit() }
                     .foregroundColor(.accent)
-                    .fontWeight(.bold)
+                    .font(.body.weight(.bold))
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 16)
