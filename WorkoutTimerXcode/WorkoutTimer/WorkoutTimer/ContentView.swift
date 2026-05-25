@@ -129,8 +129,7 @@ class WorkoutViewModel: ObservableObject {
             tickedSeconds = []
             phase = .rest
         } else {
-            // No rest configured — go straight to waiting for next round tap
-            phase = .restDone
+            phase = .countdown
         }
     }
 
@@ -201,7 +200,7 @@ class WorkoutViewModel: ObservableObject {
 
             if remaining == 0 {
                 restEnd = nil
-                // Stay in .rest phase at 0 — user taps to start next round
+                phase = .countdown
             }
         }
     }
