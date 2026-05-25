@@ -129,6 +129,7 @@ class WorkoutViewModel: ObservableObject {
             tickedSeconds = []
             phase = .rest
         } else {
+            // No rest configured — go straight to waiting for next round tap
             phase = .restDone
         }
     }
@@ -200,7 +201,7 @@ class WorkoutViewModel: ObservableObject {
 
             if remaining == 0 {
                 restEnd = nil
-                phase = .restDone
+                // Stay in .rest phase at 0 — user taps to start next round
             }
         }
     }
@@ -326,12 +327,13 @@ struct SpinBox: View {
     @Binding var value: Int
     let min: Int
     let max: Int
+    var step: Int = 1
 
     @State private var showPad = false
 
     var body: some View {
         HStack(spacing: 0) {
-            Button { if value > min { value -= 1 } } label: {
+            Button { if value - step >= min { value -= step } else { value = min } } label: {
                 Text("−").font(.system(size: 24)).foregroundColor(.accent)
                     .frame(width: 52, height: 56)
             }
@@ -351,7 +353,7 @@ struct SpinBox: View {
                 .cornerRadius(8)
             }
             Spacer()
-            Button { if value < max { value += 1 } } label: {
+            Button { if value + step <= max { value += step } else { value = max } } label: {
                 Text("+").font(.system(size: 24)).foregroundColor(.accent)
                     .frame(width: 52, height: 56)
             }
@@ -438,12 +440,21 @@ struct RingButton: View {
                         Text("Rest")
                             .font(.system(size: 12, weight: .bold)).kerning(3)
                             .textCase(.uppercase).foregroundColor(.green)
-                        Text(formatTime(restCountdown))
-                            .font(.system(size: 50, weight: .bold, design: .monospaced))
-                            .foregroundColor(.white)
-                        Text("tap to skip")
-                            .font(.system(size: 11)).foregroundColor(.dim)
-                        Text("→").font(.system(size: 18)).foregroundColor(.dim)
+                        if restCountdown > 0 {
+                            Text(formatTime(restCountdown))
+                                .font(.system(size: 50, weight: .bold, design: .monospaced))
+                                .foregroundColor(.white)
+                            Text("tap to skip")
+                                .font(.system(size: 11)).foregroundColor(.dim)
+                            Text("→").font(.system(size: 18)).foregroundColor(.dim)
+                        } else {
+                            Text("✓").font(.system(size: 40)).foregroundColor(.green)
+                            Text("Rest complete")
+                                .font(.system(size: 16, weight: .bold)).foregroundColor(.white)
+                            Text("TAP TO START →")
+                                .font(.system(size: 13, weight: .bold)).kerning(2)
+                                .foregroundColor(.accent).padding(.top, 4)
+                        }
 
                     case .restDone:
                         Text("✓").font(.system(size: 40)).foregroundColor(.green)
@@ -493,13 +504,13 @@ struct SetupView: View {
                 Text("Session Duration")
                     .font(.system(size: 11, weight: .bold)).kerning(2)
                     .textCase(.uppercase).foregroundColor(.dim)
-                SpinBox(label: "min", value: $vm.sessionMin, min: 1, max: 180)
+                SpinBox(label: "min", value: $vm.sessionMin, min: 5, max: 180, step: 5)
             }
 
             VStack(alignment: .leading, spacing: 8) {
                 ToggleRow(label: "Rest between rounds", isOn: $vm.enableRest)
                 if vm.enableRest {
-                    SpinBox(label: "min", value: $vm.restMin, min: 1, max: 30)
+                    SpinBox(label: "min", value: $vm.restMin, min: 1, max: 30, step: 1)
                         .transition(.opacity.combined(with: .move(edge: .top)))
                 }
             }
